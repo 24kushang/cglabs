@@ -54,6 +54,12 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Build Shared Package
+        run: npm --prefix packages/shared run build
+
+      - name: Build Backend Worker
+        run: npm --prefix packages/backend run build
+
       - name: Apply D1 Database Migrations (Develop / Staging)
         uses: cloudflare/wrangler-action@v3
         with:
@@ -98,6 +104,12 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+
+      - name: Build Shared Package
+        run: npm --prefix packages/shared run build
+
+      - name: Build Backend Worker
+        run: npm --prefix packages/backend run build
 
       - name: Apply D1 Database Migrations (Master / Production)
         uses: cloudflare/wrangler-action@v3
