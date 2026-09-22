@@ -9,5 +9,3 @@ database_name = "cglabs-db"
 database_id = "506b182a-eb99-413e-9939-2f71300354c5"
 migrations_dir = "migrations"
 
-[site]
-bucket = ""
