@@ -1,0 +1,16 @@
+{
+  "name": "cglabs-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "dev:backend": "npm --prefix packages/backend run dev",
+    "dev:frontend": "npm --prefix packages/frontend run dev"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}

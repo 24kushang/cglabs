@@ -1,0 +1,13 @@
+name = "cglabs-backend"
+main = "dist/worker.js"
+compatibility_date = "2024-05-12"
+compatibility_flags = [ "nodejs_compat" ]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "cglabs-d1-dev"
+database_id = "local-d1-id"
+migrations_dir = "migrations"
+
+[site]
+bucket = ""

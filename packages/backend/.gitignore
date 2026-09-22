@@ -1,0 +1,7 @@
+# Local SQLite Database files
+sqlite.db
+sqlite.db-journal
+sqlite.db-shm
+sqlite.db-wal
+local-db/*.db
+local-db/*.sqlite

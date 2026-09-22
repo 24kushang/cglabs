@@ -1,0 +1,25 @@
+{
+  "name": "Idea Pitching Platform Dev Environment",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "drizzle-team.drizzle-studio"
+      ]
+    }
+  },
+  "postCreateCommand": "pnpm install",
+  "forwardPorts": [
+    3001,
+    8787
+  ]
+}
