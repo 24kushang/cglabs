@@ -11,9 +11,11 @@ on:
       - master
 
 jobs:
-  build:
-    name: Build Frontend App
+  deploy-develop:
+    name: Deploy to Cloudflare Pages (Develop)
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
     runs-on: ubuntu-latest
+    environment: develop
 
     steps:
       - name: Checkout repository
@@ -33,29 +35,8 @@ jobs:
 
       - name: Build Frontend App
         run: npm --prefix packages/frontend run build
-
-      - name: Upload Dist Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-dist
-          path: packages/frontend/dist
-
-  deploy-develop:
-    name: Deploy to Cloudflare Pages (Develop)
-    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
-    needs: build
-    runs-on: ubuntu-latest
-    environment: develop
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Download Dist Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-dist
-          path: packages/frontend/dist
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
 
       - name: Deploy to Cloudflare Pages (Develop / Staging)
         uses: cloudflare/wrangler-action@v3
@@ -71,7 +52,6 @@ jobs:
   deploy-master:
     name: Deploy to Cloudflare Pages (Master)
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-    needs: build
     runs-on: ubuntu-latest
     environment: master
 
@@ -79,11 +59,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Download Dist Artifact
-        uses: actions/download-artifact@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          name: frontend-dist
-          path: packages/frontend/dist
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Shared Package
+        run: npm --prefix packages/shared run build
+
+      - name: Build Frontend App
+        run: npm --prefix packages/frontend run build
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
 
       - name: Deploy to Cloudflare Pages (Master / Production)
         uses: cloudflare/wrangler-action@v3
