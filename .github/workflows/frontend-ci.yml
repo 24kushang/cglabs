@@ -22,7 +22,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: 'npm'
 
       - name: Install dependencies
@@ -36,20 +36,18 @@ jobs:
 
       - name: Deploy to Cloudflare Pages (Develop / Staging)
         if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
-        uses: cloudflare/pages-action@v1
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}
-          projectName: cglabs-frontend-develop
-          directory: packages/frontend/dist
-          gitBranch: develop
+          workingDirectory: packages/frontend
+          command: pages deploy dist --project-name cglabs-frontend-develop --branch develop
 
       - name: Deploy to Cloudflare Pages (Master / Production)
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-        uses: cloudflare/pages-action@v1
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}
-          projectName: cglabs-frontend
-          directory: packages/frontend/dist
-          gitBranch: master
+          workingDirectory: packages/frontend
+          command: pages deploy dist --project-name cglabs-frontend --branch master
