@@ -11,8 +11,8 @@ on:
       - master
 
 jobs:
-  build-and-test:
-    name: Build Frontend (Cloudflare Pages)
+  build:
+    name: Build Frontend App
     runs-on: ubuntu-latest
 
     steps:
@@ -34,8 +34,30 @@ jobs:
       - name: Build Frontend App
         run: npm --prefix packages/frontend run build
 
+      - name: Upload Dist Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: packages/frontend/dist
+
+  deploy-develop:
+    name: Deploy to Cloudflare Pages (Develop)
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    needs: build
+    runs-on: ubuntu-latest
+    environment: develop
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Dist Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: packages/frontend/dist
+
       - name: Deploy to Cloudflare Pages (Develop / Staging)
-        if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
@@ -46,8 +68,24 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}
 
+  deploy-master:
+    name: Deploy to Cloudflare Pages (Master)
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    needs: build
+    runs-on: ubuntu-latest
+    environment: master
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Dist Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: packages/frontend/dist
+
       - name: Deploy to Cloudflare Pages (Master / Production)
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
