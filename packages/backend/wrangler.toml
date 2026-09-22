@@ -5,8 +5,8 @@ compatibility_flags = [ "nodejs_compat" ]
 
 [[d1_databases]]
 binding = "DB"
-database_name = "cglabs-d1-dev"
-database_id = "local-d1-id"
+database_name = "cglabs-db"
+database_id = "506b182a-eb99-413e-9939-2f71300354c5"
 migrations_dir = "migrations"
 
 [site]
