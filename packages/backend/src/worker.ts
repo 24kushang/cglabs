@@ -6,10 +6,12 @@ import { PreferencesService } from './modules/preferences/preferences.service.js
 import { IdeasService } from './modules/ideas/ideas.service.js';
 import { VotesService } from './modules/votes/votes.service.js';
 import { CommentsService } from './modules/comments/comments.service.js';
+import { AuthService } from './modules/auth/auth.service.js';
 import { ensureTablesCreated } from './db/connection.js';
 
 interface Env {
   DB: D1Database;
+  JWT_SECRET?: string;
 }
 
 let appInstance: any = null;
@@ -40,22 +42,55 @@ export default {
         headers: {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, x-temp-user-id',
+          'Access-Control-Allow-Headers': 'Content-Type, x-temp-user-id, Authorization',
         },
       });
     }
 
     const corsHeaders = {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': 'Content-Type, x-temp-user-id',
+      'Access-Control-Allow-Headers': 'Content-Type, x-temp-user-id, Authorization',
       'Content-Type': 'application/json',
     };
 
     try {
       const app = await getAppInstance();
-      const userId = request.headers.get('x-temp-user-id') || '';
+      const authService = app.get(AuthService);
+      const jwtSecret = env.JWT_SECRET || 'cglabs_fallback_jwt_secret_v1';
 
-      // Route matching
+      const authHeader = request.headers.get('Authorization') || request.headers.get('authorization') || '';
+      let rawToken = request.headers.get('x-temp-user-id') || '';
+      if (authHeader.toLowerCase().startsWith('bearer ')) {
+        rawToken = authHeader.substring(7).trim();
+      }
+
+      const userId = rawToken ? ((await authService.resolveUserId(rawToken, jwtSecret)) || rawToken) : '';
+
+      // Auth Routes
+      if (url.pathname === '/api/auth/register' && request.method === 'POST') {
+        const body = (await request.json()) as any;
+        const result = await authService.register(env.DB, body, jwtSecret);
+        return new Response(JSON.stringify(result), { headers: corsHeaders });
+      }
+
+      if (url.pathname === '/api/auth/login' && request.method === 'POST') {
+        const body = (await request.json()) as any;
+        const result = await authService.login(env.DB, body, jwtSecret);
+        return new Response(JSON.stringify(result), { headers: corsHeaders });
+      }
+
+      if (url.pathname === '/api/auth/me' && request.method === 'GET') {
+        const result = await authService.getMe(env.DB, rawToken || userId, jwtSecret);
+        return new Response(JSON.stringify(result || {}), { headers: corsHeaders });
+      }
+
+      if (url.pathname === '/api/preferences/claimed-pokemons' && request.method === 'GET') {
+        const prefService = app.get(PreferencesService);
+        const result = await prefService.getClaimedPokemons(env.DB);
+        return new Response(JSON.stringify(result), { headers: corsHeaders });
+      }
+
+      // Legacy user init fallback
       if (url.pathname === '/api/users/init' && request.method === 'POST') {
         const body = (await request.json().catch(() => ({}))) as any;
         const usersService = app.get(UsersService);

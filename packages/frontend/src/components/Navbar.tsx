@@ -2,16 +2,18 @@ import React from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, IconButton, Tooltip } from '@mui/material';
 import CatchingPokemonIcon from '@mui/icons-material/CatchingPokemon';
 import AddIcon from '@mui/icons-material/Add';
+import LogoutIcon from '@mui/icons-material/Logout';
 import { useTempUser } from '../context/TempUserContext';
 import { MascotBadge } from './mascots/MascotBadge';
 
 interface NavbarProps {
   onOpenCustomizer: () => void;
   onOpenNewPitch: () => void;
+  onOpenAuth?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenCustomizer, onOpenNewPitch }) => {
-  const { preferences, user } = useTempUser();
+export const Navbar: React.FC<NavbarProps> = ({ onOpenCustomizer, onOpenNewPitch, onOpenAuth }) => {
+  const { preferences, user, logout } = useTempUser();
 
   return (
     <AppBar position="sticky" color="default" elevation={1} sx={{ backgroundColor: 'background.paper' }}>
@@ -25,13 +27,27 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCustomizer, onOpenNewPitch
           </Typography>
         </Box>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          {preferences && (
-            <MascotBadge
-              pokemon={preferences.pokemon}
-              authorName={user?.displayName}
-              size="medium"
-            />
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          {user ? (
+            <>
+              {preferences && (
+                <MascotBadge
+                  pokemon={preferences.pokemon}
+                  authorName={`@${user.username || user.displayName}`}
+                  size="medium"
+                />
+              )}
+
+              <Tooltip title="Sign Out">
+                <IconButton size="small" onClick={logout} color="inherit">
+                  <LogoutIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </>
+          ) : (
+            <Button variant="contained" size="small" onClick={onOpenAuth}>
+              Sign In / Register
+            </Button>
           )}
 
           <Tooltip title="Select Pokémon Partner & Dark/Light Mode">

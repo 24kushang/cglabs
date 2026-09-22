@@ -167,7 +167,7 @@ export class IdeasService {
     return {
       id: idea.id,
       authorId: idea.authorId,
-      authorName: author?.displayName || 'Anonymous Explorer',
+      authorName: author?.username || author?.displayName || 'Anonymous Creator',
       authorPokemon: authorPref?.pokemon || 'pikachu',
       authorMascotQuote: authorPref?.mascotQuote || 'Always finding slick workarounds.',
       title: idea.title,

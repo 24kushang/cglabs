@@ -79,11 +79,33 @@ export interface UserPreferencesDto {
 
 export interface UserDto {
   id: string;
-  displayName: string;
-  isTemporary: boolean;
-  expiresAt: number;
+  username: string;
+  displayName?: string;
+  isTemporary?: boolean;
   createdAt: string;
   preferences?: UserPreferencesDto;
+}
+
+export interface RegisterDto {
+  username: string;
+  password: string;
+}
+
+export interface LoginDto {
+  username: string;
+  password: string;
+}
+
+export interface AuthResponseDto {
+  user: UserDto;
+  token: string;
+  preferences?: UserPreferencesDto;
+}
+
+export interface ClaimedPokemonDto {
+  pokemon: PokemonId;
+  username: string;
+  userId: string;
 }
 
 export interface CreateIdeaDto {

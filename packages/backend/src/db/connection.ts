@@ -17,11 +17,16 @@ export async function ensureTablesCreated(d1: D1Database) {
   const ddlStatements = [
     `CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
-      display_name TEXT NOT NULL,
-      is_temporary INTEGER NOT NULL DEFAULT 1,
-      expires_at INTEGER NOT NULL,
+      username TEXT NOT NULL UNIQUE,
+      password_hash TEXT NOT NULL,
+      display_name TEXT,
+      is_temporary INTEGER NOT NULL DEFAULT 0,
+      expires_at INTEGER,
       created_at TEXT NOT NULL
     );`,
+
+    `ALTER TABLE users ADD COLUMN username TEXT;`,
+    `ALTER TABLE users ADD COLUMN password_hash TEXT;`,
 
     `CREATE TABLE IF NOT EXISTS user_preferences (
       id TEXT PRIMARY KEY,

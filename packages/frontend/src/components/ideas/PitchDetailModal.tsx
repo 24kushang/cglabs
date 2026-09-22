@@ -134,7 +134,7 @@ export const PitchDetailModal: React.FC<PitchDetailModalProps> = ({
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="lg">
       <DialogTitle sx={{ p: 3, pb: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-          <MascotBadge pokemon={idea.authorPokemon} authorName={idea.authorName} showQuote />
+          <MascotBadge pokemon={idea.authorPokemon} authorName={idea.authorName.startsWith('@') ? idea.authorName : `@${idea.authorName}`} showQuote />
           <Typography variant="caption" color="text.secondary">
             Pitched on {new Date(idea.createdAt).toLocaleDateString()}
           </Typography>

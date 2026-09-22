@@ -29,7 +29,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({ comment, onReply }
   return (
     <Paper variant="outlined" sx={{ p: 2, mb: 1.5, backgroundColor: 'background.paper' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-        <MascotBadge pokemon={comment.authorPokemon} authorName={comment.authorName} size="small" />
+        <MascotBadge pokemon={comment.authorPokemon} authorName={comment.authorName.startsWith('@') ? comment.authorName : `@${comment.authorName}`} size="small" />
         <Typography variant="caption" color="text.secondary">
           {new Date(comment.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </Typography>

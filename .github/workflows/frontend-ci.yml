@@ -1,0 +1,55 @@
+name: Frontend CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+  pull_request:
+    branches:
+      - develop
+      - master
+
+jobs:
+  build-and-test:
+    name: Build Frontend (Cloudflare Pages)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Shared Package
+        run: npm --prefix packages/shared run build
+
+      - name: Build Frontend App
+        run: npm --prefix packages/frontend run build
+
+      - name: Deploy to Cloudflare Pages (Develop / Staging)
+        if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}
+          projectName: cglabs-frontend-develop
+          directory: packages/frontend/dist
+          gitBranch: develop
+
+      - name: Deploy to Cloudflare Pages (Master / Production)
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}
+          projectName: cglabs-frontend
+          directory: packages/frontend/dist
+          gitBranch: master

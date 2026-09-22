@@ -23,6 +23,7 @@ import { Navbar } from './components/Navbar';
 import { PitchCard } from './components/ideas/PitchCard';
 import { PitchDetailModal } from './components/ideas/PitchDetailModal';
 import { PitchFormModal } from './components/ideas/PitchFormModal';
+import { AuthModal } from './components/auth/AuthModal';
 import { OnboardingWizard } from './components/onboarding/OnboardingWizard';
 import { WatermarkMascot } from './components/mascots/WatermarkMascot';
 import { API_BASE } from './constants/api';
@@ -39,6 +40,7 @@ export const App: React.FC = () => {
   const [selectedArchiveMonth, setSelectedArchiveMonth] = useState<string>('archive');
 
   // Modals
+  const [authOpen, setAuthOpen] = useState(false);
   const [customizerOpen, setCustomizerOpen] = useState(false);
   const [pitchFormOpen, setPitchFormOpen] = useState(false);
   const [selectedIdea, setSelectedIdea] = useState<IdeaDto | null>(null);
@@ -92,14 +94,29 @@ export const App: React.FC = () => {
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
 
-  const mandatoryWizardOpen = !userLoading && preferences !== null && !preferences.isConfigured;
+  const mandatoryAuthOpen = !userLoading && !user;
+  const mandatoryWizardOpen = !userLoading && user !== null && preferences !== null && !preferences.isConfigured;
   const currentMonthLabel = new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' });
 
   return (
     <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default', position: 'relative', overflowX: 'hidden' }}>
       <Navbar
         onOpenCustomizer={() => setCustomizerOpen(true)}
-        onOpenNewPitch={() => setPitchFormOpen(true)}
+        onOpenNewPitch={() => {
+          if (!user) {
+            setAuthOpen(true);
+          } else {
+            setPitchFormOpen(true);
+          }
+        }}
+        onOpenAuth={() => setAuthOpen(true)}
+      />
+
+      {/* Auth Sign In / Register Dialog */}
+      <AuthModal
+        open={mandatoryAuthOpen || authOpen}
+        onClose={() => setAuthOpen(false)}
+        allowClose={!mandatoryAuthOpen}
       />
 
       {/* Mandatory Onboarding / Customization Wizard */}

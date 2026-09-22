@@ -15,7 +15,7 @@ export const PitchCard: React.FC<PitchCardProps> = ({ idea, onOpenDetail }) => {
     <Card variant="outlined" sx={{ height: '100%', display: 'flex', flexDirection: 'column', transition: '0.2s', '&:hover': { translateY: '-4px' } }}>
       <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', p: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
-          <MascotBadge pokemon={idea.authorPokemon} authorName={idea.authorName} size="small" />
+          <MascotBadge pokemon={idea.authorPokemon} authorName={idea.authorName.startsWith('@') ? idea.authorName : `@${idea.authorName}`} size="small" />
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, backgroundColor: 'action.hover', px: 1.5, py: 0.5, borderRadius: 4 }}>
             <StarIcon sx={{ color: '#f59e0b', fontSize: 18 }} />
             <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>

@@ -2,9 +2,11 @@ import { sqliteTable, text, integer, uniqueIndex } from 'drizzle-orm/sqlite-core
 
 export const users = sqliteTable('users', {
   id: text('id').primaryKey(),
-  displayName: text('display_name').notNull(),
-  isTemporary: integer('is_temporary', { mode: 'boolean' }).notNull().default(true),
-  expiresAt: integer('expires_at').notNull(), // Epoch ms
+  username: text('username').notNull().unique(),
+  passwordHash: text('password_hash').notNull(),
+  displayName: text('display_name'),
+  isTemporary: integer('is_temporary', { mode: 'boolean' }).notNull().default(false),
+  expiresAt: integer('expires_at').notNull().default(0),
   createdAt: text('created_at').notNull(),
 });
 

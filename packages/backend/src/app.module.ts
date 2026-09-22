@@ -9,6 +9,7 @@ import { VotesController } from './modules/votes/votes.controller.js';
 import { VotesService } from './modules/votes/votes.service.js';
 import { CommentsController } from './modules/comments/comments.controller.js';
 import { CommentsService } from './modules/comments/comments.service.js';
+import { AuthService } from './modules/auth/auth.service.js';
 
 @Module({
   imports: [],
@@ -25,6 +26,7 @@ import { CommentsService } from './modules/comments/comments.service.js';
     IdeasService,
     VotesService,
     CommentsService,
+    AuthService,
   ],
 })
 export class AppModule {}

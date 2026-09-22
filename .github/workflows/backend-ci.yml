@@ -1,0 +1,75 @@
+name: Backend CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+  pull_request:
+    branches:
+      - develop
+      - master
+
+jobs:
+  build-and-test:
+    name: Build Backend Worker (Cloudflare Workers)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Shared Package
+        run: npm --prefix packages/shared run build
+
+      - name: Build Backend Worker
+        run: npm --prefix packages/backend run build
+
+      - name: Apply D1 Database Migrations (Develop / Staging)
+        if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}
+          workingDirectory: packages/backend
+          command: d1 migrations apply DB --remote -y --env develop
+
+      - name: Deploy Worker to Cloudflare (Develop / Staging)
+        if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}
+          workingDirectory: packages/backend
+          command: deploy --env develop
+          secrets: |
+            JWT_SECRET
+
+      - name: Apply D1 Database Migrations (Master / Production)
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}
+          workingDirectory: packages/backend
+          command: d1 migrations apply DB --remote -y
+
+      - name: Deploy Worker to Cloudflare (Master / Production)
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}
+          workingDirectory: packages/backend
+          command: deploy
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
