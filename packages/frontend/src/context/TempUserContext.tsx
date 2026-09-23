@@ -1,6 +1,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { UserDto, UserPreferencesDto, AuthResponseDto } from '@cglabs/shared';
+import type { UserDto, UserPreferencesDto, AuthResponseDto, PokemonStage } from '@cglabs/shared';
+import { getEvolutionStage } from '@cglabs/shared';
 import { API_BASE } from '../constants/api';
+
+export interface EvolutionCelebrationData {
+  pokemon: string;
+  oldStage: PokemonStage;
+  newStage: PokemonStage;
+  newLevel: number;
+}
 
 interface TempUserContextType {
   user: UserDto | null;
@@ -9,6 +17,9 @@ interface TempUserContextType {
   register: (username: string, password: string) => Promise<void>;
   logout: () => void;
   updatePreferences: (newPrefs: Partial<UserPreferencesDto>) => Promise<void>;
+  refreshUser: () => Promise<void>;
+  evolutionCelebration: EvolutionCelebrationData | null;
+  clearCelebration: () => void;
   isLoading: boolean;
 }
 
@@ -21,11 +32,57 @@ const TempUserContext = createContext<TempUserContextType | undefined>(undefined
 export const TempUserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserDto | null>(null);
   const [preferences, setPreferences] = useState<UserPreferencesDto | null>(null);
+  const [evolutionCelebration, setEvolutionCelebration] = useState<EvolutionCelebrationData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     initAuthSession();
   }, []);
+
+  const refreshUser = async () => {
+    const storedToken = localStorage.getItem(AUTH_TOKEN_KEY);
+    if (!storedToken) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/me`, {
+        headers: {
+          'x-temp-user-id': storedToken,
+        },
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.user) {
+          setUser(data.user);
+          localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data.user));
+        }
+        if (data.preferences) {
+          const oldLevel = preferences?.level || 1;
+          const newLevel = data.preferences.level || 1;
+          const pokemon = data.preferences.pokemon || 'pikachu';
+
+          // Check if user evolved
+          if (newLevel > oldLevel && preferences) {
+            const oldStage = getEvolutionStage(pokemon, oldLevel).currentStage;
+            const newStage = getEvolutionStage(pokemon, newLevel).currentStage;
+            if (oldStage.stage !== newStage.stage) {
+              setEvolutionCelebration({
+                pokemon,
+                oldStage,
+                newStage,
+                newLevel,
+              });
+            }
+          }
+
+          setPreferences(data.preferences);
+          localStorage.setItem(PREFS_KEY, JSON.stringify(data.preferences));
+        }
+      }
+    } catch (e) {
+      console.error('Failed to refresh user', e);
+    }
+  };
 
   const initAuthSession = async () => {
     setIsLoading(true);
@@ -53,12 +110,18 @@ export const TempUserProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           if (data.user) {
             setUser(data.user);
             localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data.user));
+          } else {
+            logout();
           }
           if (data.preferences) {
             setPreferences(data.preferences);
             localStorage.setItem(PREFS_KEY, JSON.stringify(data.preferences));
           }
+        } else {
+          logout();
         }
+      } else {
+        logout();
       }
     } catch (err) {
       console.error('Failed to restore auth session', err);
@@ -134,9 +197,11 @@ export const TempUserProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       density: 'comfortable',
       pokemon: 'pikachu',
       mascotQuote: 'Innovating at full speed.',
+      isConfigured: true,
+      exp: preferences?.exp || 0,
+      level: preferences?.level || 1,
       ...preferences,
       ...newPrefs,
-      isConfigured: true,
     };
 
     setPreferences(merged);
@@ -177,6 +242,9 @@ export const TempUserProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         register,
         logout,
         updatePreferences,
+        refreshUser,
+        evolutionCelebration,
+        clearCelebration: () => setEvolutionCelebration(null),
         isLoading,
       }}
     >
@@ -190,4 +258,3 @@ export const useTempUser = () => {
   if (!context) throw new Error('useTempUser must be used within TempUserProvider');
   return context;
 };
-

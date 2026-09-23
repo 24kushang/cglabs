@@ -45,6 +45,8 @@ export async function ensureTablesCreated(d1: D1Database) {
     );`,
 
     `ALTER TABLE user_preferences ADD COLUMN pokemon TEXT DEFAULT 'pikachu';`,
+    `ALTER TABLE user_preferences ADD COLUMN exp INTEGER DEFAULT 0;`,
+    `ALTER TABLE user_preferences ADD COLUMN level INTEGER DEFAULT 1;`,
 
     `CREATE TABLE IF NOT EXISTS ideas (
       id TEXT PRIMARY KEY,
@@ -56,6 +58,10 @@ export async function ensureTablesCreated(d1: D1Database) {
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );`,
+
+    `ALTER TABLE ideas ADD COLUMN battle_wins INTEGER DEFAULT 0;`,
+    `ALTER TABLE ideas ADD COLUMN battle_losses INTEGER DEFAULT 0;`,
+    `ALTER TABLE ideas ADD COLUMN is_in_arena INTEGER DEFAULT 0;`,
 
     `CREATE TABLE IF NOT EXISTS votes (
       id TEXT PRIMARY KEY,
@@ -73,6 +79,33 @@ export async function ensureTablesCreated(d1: D1Database) {
       parent_id TEXT,
       content TEXT NOT NULL,
       created_at TEXT NOT NULL
+    );`,
+
+    `CREATE TABLE IF NOT EXISTS showdown_battles (
+      id TEXT PRIMARY KEY,
+      winner_idea_id TEXT NOT NULL,
+      loser_idea_id TEXT NOT NULL,
+      voter_user_id TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );`,
+
+    `CREATE TABLE IF NOT EXISTS showdown_matches (
+      id TEXT PRIMARY KEY,
+      idea_a_id TEXT NOT NULL,
+      idea_b_id TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'active',
+      winner_idea_id TEXT,
+      created_at TEXT NOT NULL,
+      concluded_at TEXT
+    );`,
+
+    `CREATE TABLE IF NOT EXISTS showdown_votes (
+      id TEXT PRIMARY KEY,
+      match_id TEXT NOT NULL,
+      voter_user_id TEXT NOT NULL,
+      voted_idea_id TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      UNIQUE(match_id, voter_user_id)
     );`,
   ];
 

@@ -19,6 +19,7 @@ import rehypeSanitize from 'rehype-sanitize';
 import type { CreateIdeaDto } from '@cglabs/shared';
 import { useTempUser } from '../../context/TempUserContext';
 import { API_BASE } from '../../constants/api';
+import { triggerMascotReaction } from '../../utils/mascotEvents';
 
 interface PitchFormModalProps {
   open: boolean;
@@ -36,6 +37,8 @@ export const PitchFormModal: React.FC<PitchFormModalProps> = ({ open, onClose, o
   const [tab, setTab] = useState<0 | 1>(0);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const milestone100Ref = React.useRef(false);
+  const milestone200Ref = React.useRef(false);
 
   const getCharCount = (str: string) => [...str.trim()].length;
   const rawCharCount = [...shortDescription].length;
@@ -86,9 +89,12 @@ export const PitchFormModal: React.FC<PitchFormModalProps> = ({ open, onClose, o
       });
 
       if (res.ok) {
+        triggerMascotReaction("PITCH DEPLOYED! +50 EXP awarded! Let's go! 🎉", 'excited', 'fanfare');
         setTitle('');
         setShortDescription('');
         setPitchMarkdown('');
+        milestone100Ref.current = false;
+        milestone200Ref.current = false;
         onSuccess();
         onClose();
       } else {
@@ -126,8 +132,17 @@ export const PitchFormModal: React.FC<PitchFormModalProps> = ({ open, onClose, o
             value={shortDescription}
             onChange={(e) => {
               const val = e.target.value;
-              if ([...val].length <= 280) {
+              const len = [...val].length;
+              if (len <= 280) {
                 setShortDescription(val);
+                if (len >= 100 && !milestone100Ref.current) {
+                  milestone100Ref.current = true;
+                  triggerMascotReaction('Great problem hook! Making it punchy! ✨', 'happy', 'chirp');
+                }
+                if (len >= 200 && !milestone200Ref.current) {
+                  milestone200Ref.current = true;
+                  triggerMascotReaction('Awesome detail! Getting close to the 280-char sweet spot! 🚀', 'excited', 'chime');
+                }
               }
             }}
             placeholder="Summarize your idea in 280 characters or fewer..."

@@ -10,6 +10,9 @@ import { VotesService } from './modules/votes/votes.service.js';
 import { CommentsController } from './modules/comments/comments.controller.js';
 import { CommentsService } from './modules/comments/comments.service.js';
 import { AuthService } from './modules/auth/auth.service.js';
+import { ExpService } from './modules/users/exp.service.js';
+import { ArenaController } from './modules/arena/arena.controller.js';
+import { ArenaService } from './modules/arena/arena.service.js';
 
 @Module({
   imports: [],
@@ -19,14 +22,17 @@ import { AuthService } from './modules/auth/auth.service.js';
     IdeasController,
     VotesController,
     CommentsController,
+    ArenaController,
   ],
   providers: [
     UsersService,
+    ExpService,
     PreferencesService,
     IdeasService,
     VotesService,
     CommentsService,
     AuthService,
+    ArenaService,
   ],
 })
 export class AppModule {}

@@ -65,6 +65,8 @@ export class AuthService {
       mascotQuote: 'Sparking high-voltage breakthroughs with relentless energy.',
       customizedAt: nowIso,
       isConfigured: false,
+      exp: 0,
+      level: 1,
     };
 
     await db.insert(userPreferences).values(defaultPrefs);

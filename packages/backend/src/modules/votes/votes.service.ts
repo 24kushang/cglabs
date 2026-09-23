@@ -1,9 +1,11 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { eq, and } from 'drizzle-orm';
-import { votes } from '../../db/schema.js';
+import { votes, ideas } from '../../db/schema.js';
 import type { D1Database } from '@cloudflare/workers-types';
 import { getDb } from '../../db/connection.js';
+import { EXP_REWARDS } from '@cglabs/shared';
 import { UsersService } from '../users/users.service.js';
+import { ExpService } from '../users/exp.service.js';
 
 @Injectable()
 export class VotesService {
@@ -35,6 +37,15 @@ export class VotesService {
         coolnessScore,
         createdAt: nowIso,
       });
+
+      // Award EXP for casting a vote (first time only)
+      await ExpService.awardExp(dbBinding, userId, EXP_REWARDS.VOTE_CAST, 'Cast Coolness Vote');
+
+      // Award EXP to the idea author for receiving a community vote
+      const targetIdea = await db.query.ideas.findFirst({ where: eq(ideas.id, ideaId) });
+      if (targetIdea && targetIdea.authorId && targetIdea.authorId !== userId) {
+        await ExpService.awardExp(dbBinding, targetIdea.authorId, EXP_REWARDS.VOTE_RECEIVED, 'Received Idea Vote');
+      }
     }
 
     const ideaVotes = await db.select().from(votes).where(eq(votes.ideaId, ideaId));

@@ -4,7 +4,9 @@ import { ideas, users, userPreferences, votes } from '../../db/schema.js';
 import type { D1Database } from '@cloudflare/workers-types';
 import { getDb } from '../../db/connection.js';
 import type { CreateIdeaDto, ArchiveMonthDto } from '@cglabs/shared';
+import { EXP_REWARDS, getEvolutionStage } from '@cglabs/shared';
 import { UsersService } from '../users/users.service.js';
+import { ExpService } from '../users/exp.service.js';
 
 @Injectable()
 export class IdeasService {
@@ -38,6 +40,9 @@ export class IdeasService {
       createdAt: nowIso,
       updatedAt: nowIso,
     });
+
+    // Award EXP for creating a pitch proposal
+    await ExpService.awardExp(dbBinding, authorId, EXP_REWARDS.PITCH_CREATED, 'Pitch Proposal Created');
 
     return this.getIdeaById(dbBinding, id, authorId);
   }
@@ -128,10 +133,10 @@ export class IdeasService {
       throw new BadRequestException('Idea pitch not found.');
     }
 
-    return this.formatIdea(dbBinding, idea, currentUserId);
+    return IdeasService.formatIdea(dbBinding, idea, currentUserId);
   }
 
-  private async formatIdea(dbBinding: D1Database, idea: any, currentUserId?: string) {
+  static async formatIdea(dbBinding: D1Database, idea: any, currentUserId?: string) {
     const db = getDb(dbBinding);
 
     const author = await db.query.users.findFirst({
@@ -164,11 +169,22 @@ export class IdeasService {
     const currentMonthKey = new Date().toISOString().substring(0, 7);
     const ideaMonthKey = idea.createdAt ? idea.createdAt.substring(0, 7) : currentMonthKey;
 
+    const authorLevel = authorPref?.level || 1;
+    const authorEvolution = getEvolutionStage(authorPref?.pokemon || 'pikachu', authorLevel);
+
+    const battleWins = Number(idea.battleWins || 0);
+    const battleLosses = Number(idea.battleLosses || 0);
+    const totalBattles = battleWins + battleLosses;
+    const battleWinRate = totalBattles > 0 ? Math.round((battleWins / totalBattles) * 100) : 0;
+
     return {
       id: idea.id,
       authorId: idea.authorId,
       authorName: author?.username || author?.displayName || 'Anonymous Creator',
       authorPokemon: authorPref?.pokemon || 'pikachu',
+      authorLevel,
+      authorStageName: authorEvolution.currentStage.name,
+      authorStageImage: authorEvolution.currentStage.imageUrl,
       authorMascotQuote: authorPref?.mascotQuote || 'Always finding slick workarounds.',
       title: idea.title,
       shortDescription: idea.shortDescription,
@@ -177,10 +193,18 @@ export class IdeasService {
       averageCoolness,
       totalVotes,
       userVote,
+      battleWins,
+      battleLosses,
+      battleWinRate,
+      isInArena: Boolean(idea.isInArena),
       createdAt: idea.createdAt,
       updatedAt: idea.updatedAt,
       isCurrentMonth: ideaMonthKey === currentMonthKey,
       monthKey: ideaMonthKey,
     };
+  }
+
+  async formatIdea(dbBinding: D1Database, idea: any, currentUserId?: string) {
+    return IdeasService.formatIdea(dbBinding, idea, currentUserId);
   }
 }

@@ -64,6 +64,20 @@ export interface PokemonConfig {
   imageUrl: string;
 }
 
+export interface PokemonStage {
+  stage: 1 | 2 | 3;
+  name: string;
+  dexId: number;
+  minLevel: number;
+  imageUrl: string;
+  title: string;
+}
+
+export interface PokemonEvolutionLine {
+  baseId: PokemonId;
+  stages: PokemonStage[];
+}
+
 export interface UserPreferencesDto {
   themePresetId: ThemePresetId;
   primaryColor: string;
@@ -75,6 +89,8 @@ export interface UserPreferencesDto {
   pokemon: PokemonId;
   mascotQuote: string;
   isConfigured: boolean;
+  exp: number;
+  level: number;
 }
 
 export interface UserDto {
@@ -84,6 +100,8 @@ export interface UserDto {
   isTemporary?: boolean;
   createdAt: string;
   preferences?: UserPreferencesDto;
+  exp?: number;
+  level?: number;
 }
 
 export interface RegisterDto {
@@ -120,6 +138,9 @@ export interface IdeaDto {
   authorId: string;
   authorName: string;
   authorPokemon?: PokemonId;
+  authorLevel?: number;
+  authorStageName?: string;
+  authorStageImage?: string;
   authorMascotQuote?: string;
   title: string;
   shortDescription: string;
@@ -128,6 +149,10 @@ export interface IdeaDto {
   averageCoolness: number; // 1-10 average
   totalVotes: number;
   userVote?: number; // 1-10 rating if voted by current user
+  battleWins?: number;
+  battleLosses?: number;
+  battleWinRate?: number; // 0 to 100 percentage
+  isInArena?: boolean;
   createdAt: string;
   updatedAt: string;
   isCurrentMonth: boolean;
@@ -159,8 +184,86 @@ export interface CommentDto {
   authorId: string;
   authorName: string;
   authorPokemon?: PokemonId;
+  authorLevel?: number;
+  authorStageName?: string;
+  authorStageImage?: string;
   parentId?: string | null;
   content: string;
   createdAt: string;
   replies?: CommentDto[];
+}
+
+export interface ArenaMatchDto {
+  id: string;
+  ideaA: IdeaDto;
+  ideaB: IdeaDto;
+  status: 'active' | 'concluded';
+  winnerIdeaId?: string | null;
+  votesA: number;
+  votesB: number;
+  totalVotes: number;
+  percentA: number;
+  percentB: number;
+  hasVoted: boolean;
+  userVotedIdeaId?: string | null;
+  isContender: boolean;
+  userIsAuthorA: boolean;
+  userIsAuthorB: boolean;
+  createdAt: string;
+  concludedAt?: string | null;
+}
+
+export interface ArenaVoteRequestDto {
+  matchId: string;
+  votedIdeaId: string;
+}
+
+export interface ArenaNominateDto {
+  ideaId: string;
+}
+
+export interface ArenaStartMatchDto {
+  ideaAId: string;
+  ideaBId: string;
+}
+
+export interface ArenaConcludeResultDto {
+  success: boolean;
+  matchId: string;
+  winnerIdeaId: string | null;
+  winnerTitle?: string;
+  winnerVotes: number;
+  loserVotes: number;
+  isDraw: boolean;
+  authorExpEarned: number;
+}
+
+export interface ShowdownMatchupDto {
+  ideaA: IdeaDto;
+  ideaB: IdeaDto;
+  totalPoolCount: number;
+}
+
+export interface ShowdownVoteDto {
+  winnerIdeaId: string;
+  loserIdeaId: string;
+}
+
+export interface ShowdownResultDto {
+  success: boolean;
+  winnerIdeaId: string;
+  loserIdeaId: string;
+  winnerWins: number;
+  loserLosses: number;
+  voterExpEarned: number;
+  newMatchup?: ShowdownMatchupDto | null;
+}
+
+export interface ArenaLeaderboardEntryDto {
+  idea: IdeaDto;
+  battleWins: number;
+  battleLosses: number;
+  totalBattles: number;
+  winRate: number; // 0 - 100
+  rank: number;
 }

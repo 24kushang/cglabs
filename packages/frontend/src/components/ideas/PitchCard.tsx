@@ -1,21 +1,51 @@
 import React from 'react';
-import { Card, CardContent, Typography, Box, Chip, Button } from '@mui/material';
+import { Card, CardContent, Typography, Box, Chip, Button, Link } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import FolderArchiveIcon from '@mui/icons-material/FolderCopy';
 import type { IdeaDto } from '@cglabs/shared';
 import { MascotBadge } from '../mascots/MascotBadge';
+import { navigate } from '../../utils/router';
 
 interface PitchCardProps {
   idea: IdeaDto;
-  onOpenDetail: (idea: IdeaDto) => void;
+  onOpenDetail?: (idea: IdeaDto) => void;
 }
 
 export const PitchCard: React.FC<PitchCardProps> = ({ idea, onOpenDetail }) => {
+  const handleClick = (e: React.MouseEvent) => {
+    // If middle click or Cmd/Ctrl/Shift click, allow native browser new tab
+    if (e.button === 1 || e.metaKey || e.ctrlKey || e.shiftKey) {
+      return;
+    }
+    e.preventDefault();
+    if (onOpenDetail) {
+      onOpenDetail(idea);
+    } else {
+      navigate(`/ideas/${idea.id}`);
+    }
+  };
+
+  const ideaUrl = `/ideas/${idea.id}`;
+
   return (
-    <Card variant="outlined" sx={{ height: '100%', display: 'flex', flexDirection: 'column', transition: '0.2s', '&:hover': { translateY: '-4px' } }}>
+    <Card
+      variant="outlined"
+      sx={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        transition: '0.2s',
+        '&:hover': { translateY: '-4px', boxShadow: 3 },
+      }}
+    >
       <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', p: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
-          <MascotBadge pokemon={idea.authorPokemon} authorName={idea.authorName.startsWith('@') ? idea.authorName : `@${idea.authorName}`} size="small" />
+          <MascotBadge
+            pokemon={idea.authorPokemon}
+            authorName={idea.authorName.startsWith('@') ? idea.authorName : `@${idea.authorName}`}
+            level={idea.authorLevel || 1}
+            size="small"
+          />
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, backgroundColor: 'action.hover', px: 1.5, py: 0.5, borderRadius: 4 }}>
             <StarIcon sx={{ color: '#f59e0b', fontSize: 18 }} />
             <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
@@ -27,8 +57,8 @@ export const PitchCard: React.FC<PitchCardProps> = ({ idea, onOpenDetail }) => {
           </Box>
         </Box>
 
-        {!idea.isCurrentMonth && (
-          <Box sx={{ mb: 1 }}>
+        <Box sx={{ display: 'flex', gap: 0.5, mb: 1, flexWrap: 'wrap' }}>
+          {!idea.isCurrentMonth && (
             <Chip
               icon={<FolderArchiveIcon fontSize="small" />}
               label={`Archived (${idea.monthKey})`}
@@ -36,10 +66,32 @@ export const PitchCard: React.FC<PitchCardProps> = ({ idea, onOpenDetail }) => {
               color="warning"
               variant="outlined"
             />
-          </Box>
-        )}
+          )}
+          {idea.isInArena && (
+            <Chip
+              label="🏟️ In Arena Showdown"
+              size="small"
+              color="secondary"
+              variant="outlined"
+              sx={{ fontWeight: 700 }}
+            />
+          )}
+        </Box>
 
-        <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, cursor: 'pointer' }} onClick={() => onOpenDetail(idea)}>
+        <Typography
+          variant="h6"
+          component="a"
+          href={ideaUrl}
+          onClick={handleClick}
+          sx={{
+            fontWeight: 700,
+            mb: 1,
+            color: 'inherit',
+            textDecoration: 'none',
+            cursor: 'pointer',
+            '&:hover': { color: 'primary.main', textDecoration: 'underline' },
+          }}
+        >
           {idea.title}
         </Typography>
 
@@ -57,7 +109,14 @@ export const PitchCard: React.FC<PitchCardProps> = ({ idea, onOpenDetail }) => {
           <Typography variant="caption" color="text.secondary">
             {new Date(idea.createdAt).toLocaleDateString()}
           </Typography>
-          <Button variant="contained" size="small" onClick={() => onOpenDetail(idea)}>
+          <Button
+            component="a"
+            href={ideaUrl}
+            onClick={handleClick}
+            variant="contained"
+            size="small"
+            sx={{ textTransform: 'none' }}
+          >
             View Pitch & Rate &rarr;
           </Button>
         </Box>

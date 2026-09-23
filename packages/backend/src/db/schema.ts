@@ -24,6 +24,8 @@ export const userPreferences = sqliteTable('user_preferences', {
   mascotQuote: text('mascot_quote').notNull().default('Always finding slick workarounds.'),
   customizedAt: text('customized_at').notNull(),
   isConfigured: integer('is_configured', { mode: 'boolean' }).notNull().default(false),
+  exp: integer('exp').notNull().default(0),
+  level: integer('level').notNull().default(1),
 });
 
 export const ideas = sqliteTable('ideas', {
@@ -33,6 +35,9 @@ export const ideas = sqliteTable('ideas', {
   shortDescription: text('short_description').notNull(), // Max 280 chars
   pitchMarkdown: text('pitch_markdown').notNull(),        // Markdown full proposal
   tags: text('tags').notNull().default('[]'),              // JSON array string
+  battleWins: integer('battle_wins').notNull().default(0),
+  battleLosses: integer('battle_losses').notNull().default(0),
+  isInArena: integer('is_in_arena', { mode: 'boolean' }).notNull().default(false),
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
 });
@@ -55,3 +60,31 @@ export const comments = sqliteTable('comments', {
   content: text('content').notNull(),
   createdAt: text('created_at').notNull(),
 });
+
+export const showdownBattles = sqliteTable('showdown_battles', {
+  id: text('id').primaryKey(),
+  winnerIdeaId: text('winner_idea_id').notNull().references(() => ideas.id, { onDelete: 'cascade' }),
+  loserIdeaId: text('loser_idea_id').notNull().references(() => ideas.id, { onDelete: 'cascade' }),
+  voterUserId: text('voter_user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  createdAt: text('created_at').notNull(),
+});
+
+export const showdownMatches = sqliteTable('showdown_matches', {
+  id: text('id').primaryKey(),
+  ideaAId: text('idea_a_id').notNull().references(() => ideas.id, { onDelete: 'cascade' }),
+  ideaBId: text('idea_b_id').notNull().references(() => ideas.id, { onDelete: 'cascade' }),
+  status: text('status').notNull().default('active'), // 'active' | 'concluded'
+  winnerIdeaId: text('winner_idea_id').references(() => ideas.id, { onDelete: 'set null' }),
+  createdAt: text('created_at').notNull(),
+  concludedAt: text('concluded_at'),
+});
+
+export const showdownVotes = sqliteTable('showdown_votes', {
+  id: text('id').primaryKey(),
+  matchId: text('match_id').notNull().references(() => showdownMatches.id, { onDelete: 'cascade' }),
+  voterUserId: text('voter_user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  votedIdeaId: text('voted_idea_id').notNull().references(() => ideas.id, { onDelete: 'cascade' }),
+  createdAt: text('created_at').notNull(),
+}, (table) => ({
+  matchUserVoteIdx: uniqueIndex('match_user_vote_idx').on(table.matchId, table.voterUserId),
+}));

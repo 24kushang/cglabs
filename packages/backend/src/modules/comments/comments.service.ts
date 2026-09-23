@@ -4,7 +4,9 @@ import { comments, users, userPreferences } from '../../db/schema.js';
 import type { D1Database } from '@cloudflare/workers-types';
 import { getDb } from '../../db/connection.js';
 import type { CreateCommentDto, CommentDto } from '@cglabs/shared';
+import { EXP_REWARDS, getEvolutionStage } from '@cglabs/shared';
 import { UsersService } from '../users/users.service.js';
+import { ExpService } from '../users/exp.service.js';
 
 @Injectable()
 export class CommentsService {
@@ -29,8 +31,14 @@ export class CommentsService {
       createdAt: nowIso,
     });
 
+    // Award EXP for posting a feedback comment
+    await ExpService.awardExp(dbBinding, authorId, EXP_REWARDS.COMMENT_ADDED, 'Discussion Comment');
+
     const author = await db.query.users.findFirst({ where: eq(users.id, authorId) });
     const authorPref = await db.query.userPreferences.findFirst({ where: eq(userPreferences.userId, authorId) });
+
+    const authorLevel = authorPref?.level || 1;
+    const authorEvo = getEvolutionStage(authorPref?.pokemon || 'pikachu', authorLevel);
 
     return {
       id,
@@ -38,6 +46,9 @@ export class CommentsService {
       authorId,
       authorName: author?.username || author?.displayName || 'Anonymous Creator',
       authorPokemon: authorPref?.pokemon || 'pikachu',
+      authorLevel,
+      authorStageName: authorEvo.currentStage.name,
+      authorStageImage: authorEvo.currentStage.imageUrl,
       parentId: dto.parentId || null,
       content: dto.content.trim(),
       createdAt: nowIso,
@@ -60,12 +71,18 @@ export class CommentsService {
       const author = await db.query.users.findFirst({ where: eq(users.id, c.authorId) });
       const authorPref = await db.query.userPreferences.findFirst({ where: eq(userPreferences.userId, c.authorId) });
 
+      const authorLevel = authorPref?.level || 1;
+      const authorEvo = getEvolutionStage(authorPref?.pokemon || 'pikachu', authorLevel);
+
       const formatted: CommentDto = {
         id: c.id,
         ideaId: c.ideaId,
         authorId: c.authorId,
         authorName: author?.username || author?.displayName || 'Anonymous Creator',
         authorPokemon: (authorPref?.pokemon as any) || 'pikachu',
+        authorLevel,
+        authorStageName: authorEvo.currentStage.name,
+        authorStageImage: authorEvo.currentStage.imageUrl,
         parentId: c.parentId,
         content: c.content,
         createdAt: c.createdAt,

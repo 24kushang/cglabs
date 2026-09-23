@@ -7,6 +7,7 @@ import { IdeasService } from './modules/ideas/ideas.service.js';
 import { VotesService } from './modules/votes/votes.service.js';
 import { CommentsService } from './modules/comments/comments.service.js';
 import { AuthService } from './modules/auth/auth.service.js';
+import { ArenaService } from './modules/arena/arena.service.js';
 import { ensureTablesCreated } from './db/connection.js';
 
 interface Env {
@@ -158,6 +159,47 @@ export default {
         const commentDto = body.comment || body;
         const commentsService = app.get(CommentsService);
         const result = await commentsService.addComment(env.DB, userId, commentDto);
+        return new Response(JSON.stringify(result), { headers: corsHeaders });
+      }
+
+      if (url.pathname === '/api/arena/active-match' && request.method === 'GET') {
+        const result = await ArenaService.getActiveMatch(env.DB, userId);
+        return new Response(JSON.stringify(result), { headers: corsHeaders });
+      }
+
+      if (url.pathname === '/api/arena/nominated-ideas' && request.method === 'GET') {
+        const result = await ArenaService.getNominatedIdeas(env.DB);
+        return new Response(JSON.stringify(result), { headers: corsHeaders });
+      }
+
+      if (url.pathname === '/api/arena/nominate' && request.method === 'POST') {
+        const body = (await request.json()) as any;
+        const result = await ArenaService.nominateIdea(env.DB, userId, body.ideaId);
+        return new Response(JSON.stringify(result), { headers: corsHeaders });
+      }
+
+      if (url.pathname === '/api/arena/start-match' && request.method === 'POST') {
+        const body = (await request.json()) as any;
+        const matchId = await ArenaService.startMatch(env.DB, body.ideaAId, body.ideaBId);
+        return new Response(JSON.stringify({ success: true, matchId }), { headers: corsHeaders });
+      }
+
+      if (url.pathname === '/api/arena/vote' && request.method === 'POST') {
+        const body = (await request.json()) as any;
+        const result = await ArenaService.recordAudienceVote(env.DB, userId, body.matchId, body.votedIdeaId);
+        return new Response(JSON.stringify(result), { headers: corsHeaders });
+      }
+
+      if (url.pathname === '/api/arena/conclude' && request.method === 'POST') {
+        const body = (await request.json()) as any;
+        const result = await ArenaService.concludeMatch(env.DB, body.matchId);
+        return new Response(JSON.stringify(result), { headers: corsHeaders });
+      }
+
+      if (url.pathname === '/api/arena/leaderboard' && request.method === 'GET') {
+        const limitStr = url.searchParams.get('limit') || '25';
+        const limit = parseInt(limitStr, 10);
+        const result = await ArenaService.getLeaderboard(env.DB, limit);
         return new Response(JSON.stringify(result), { headers: corsHeaders });
       }
 
