@@ -51,7 +51,22 @@ export type PokemonId =
   | 'machamp'
   | 'arcanine'
   | 'psyduck'
-  | 'togepi';
+  | 'togepi'
+  | 'incineroar'
+  | 'metagross'
+  | 'mimikyu'
+  | 'decidueye'
+  | 'cinderace'
+  | 'zoroark'
+  | 'ampharos'
+  | 'salamence'
+  | 'infernape'
+  | 'alakazam'
+  | 'meowscarada'
+  | 'skeledirge'
+  | 'swampert'
+  | 'aegislash'
+  | 'glaceon';
 
 export interface PokemonConfig {
   id: PokemonId;

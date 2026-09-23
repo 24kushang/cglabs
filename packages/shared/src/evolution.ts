@@ -312,6 +312,126 @@ export const POKEMON_EVOLUTION_LINES: Record<PokemonId, PokemonEvolutionLine> = 
       { stage: 3, name: 'Togekiss', dexId: 468, minLevel: 15, title: 'Serene Benefactor', imageUrl: pokeImg(468) },
     ],
   },
+  incineroar: {
+    baseId: 'incineroar',
+    stages: [
+      { stage: 1, name: 'Litten', dexId: 725, minLevel: 1, title: 'Ember Kitten', imageUrl: pokeImg(725) },
+      { stage: 2, name: 'Torracat', dexId: 726, minLevel: 5, title: 'Flame Striker', imageUrl: pokeImg(726) },
+      { stage: 3, name: 'Incineroar', dexId: 727, minLevel: 15, title: 'Apex Heel Champion', imageUrl: pokeImg(727) },
+    ],
+  },
+  metagross: {
+    baseId: 'metagross',
+    stages: [
+      { stage: 1, name: 'Beldum', dexId: 374, minLevel: 1, title: 'Magnetic Cell', imageUrl: pokeImg(374) },
+      { stage: 2, name: 'Metang', dexId: 375, minLevel: 5, title: 'Dual-Core Processor', imageUrl: pokeImg(375) },
+      { stage: 3, name: 'Metagross', dexId: 376, minLevel: 15, title: 'Supercomputer Brain', imageUrl: pokeImg(376) },
+    ],
+  },
+  mimikyu: {
+    baseId: 'mimikyu',
+    stages: [
+      { stage: 1, name: 'Mimikyu', dexId: 778, minLevel: 1, title: 'Disguised Seeker', imageUrl: pokeImg(778) },
+      { stage: 2, name: 'Phantom Mimikyu', dexId: 778, minLevel: 10, title: 'Shadow Performer', imageUrl: pokeImg(778) },
+      { stage: 3, name: 'Radiant Mimikyu', dexId: 778, minLevel: 15, title: 'Beloved Mascot', imageUrl: pokeImg(778) },
+    ],
+  },
+  decidueye: {
+    baseId: 'decidueye',
+    stages: [
+      { stage: 1, name: 'Rowlet', dexId: 722, minLevel: 1, title: 'Leaf Fledgling', imageUrl: pokeImg(722) },
+      { stage: 2, name: 'Dartrix', dexId: 723, minLevel: 5, title: 'Blade Feather', imageUrl: pokeImg(723) },
+      { stage: 3, name: 'Decidueye', dexId: 724, minLevel: 15, title: 'Silent Sharpshooter', imageUrl: pokeImg(724) },
+    ],
+  },
+  cinderace: {
+    baseId: 'cinderace',
+    stages: [
+      { stage: 1, name: 'Scorbunny', dexId: 815, minLevel: 1, title: 'Spirited Sprinter', imageUrl: pokeImg(815) },
+      { stage: 2, name: 'Raboot', dexId: 816, minLevel: 5, title: 'Focused Dynamo', imageUrl: pokeImg(816) },
+      { stage: 3, name: 'Cinderace', dexId: 817, minLevel: 15, title: 'Goal Striker', imageUrl: pokeImg(817) },
+    ],
+  },
+  zoroark: {
+    baseId: 'zoroark',
+    stages: [
+      { stage: 1, name: 'Zorua', dexId: 570, minLevel: 1, title: 'Trickster Pup', imageUrl: pokeImg(570) },
+      { stage: 2, name: 'Shadow Zorua', dexId: 570, minLevel: 10, title: 'Illusion Scout', imageUrl: pokeImg(570) },
+      { stage: 3, name: 'Zoroark', dexId: 571, minLevel: 15, title: 'Master Illusionist', imageUrl: pokeImg(571) },
+    ],
+  },
+  ampharos: {
+    baseId: 'ampharos',
+    stages: [
+      { stage: 1, name: 'Mareep', dexId: 179, minLevel: 1, title: 'Static Wool', imageUrl: pokeImg(179) },
+      { stage: 2, name: 'Flaaffy', dexId: 180, minLevel: 5, title: 'Glowing Fleece', imageUrl: pokeImg(180) },
+      { stage: 3, name: 'Ampharos', dexId: 181, minLevel: 15, title: 'Lighthouse Beacon', imageUrl: pokeImg(181) },
+    ],
+  },
+  salamence: {
+    baseId: 'salamence',
+    stages: [
+      { stage: 1, name: 'Bagon', dexId: 371, minLevel: 1, title: 'Unyielding Dreamer', imageUrl: pokeImg(371) },
+      { stage: 2, name: 'Shelgon', dexId: 372, minLevel: 5, title: 'Armored Cocoon', imageUrl: pokeImg(372) },
+      { stage: 3, name: 'Salamence', dexId: 373, minLevel: 15, title: 'Soaring Conqueror', imageUrl: pokeImg(373) },
+    ],
+  },
+  infernape: {
+    baseId: 'infernape',
+    stages: [
+      { stage: 1, name: 'Chimchar', dexId: 390, minLevel: 1, title: 'Fiery Scamp', imageUrl: pokeImg(390) },
+      { stage: 2, name: 'Monferno', dexId: 391, minLevel: 5, title: 'Acrobatic Spark', imageUrl: pokeImg(391) },
+      { stage: 3, name: 'Infernape', dexId: 392, minLevel: 15, title: 'Martial Innovator', imageUrl: pokeImg(392) },
+    ],
+  },
+  alakazam: {
+    baseId: 'alakazam',
+    stages: [
+      { stage: 1, name: 'Abra', dexId: 63, minLevel: 1, title: 'Psionic Slumberer', imageUrl: pokeImg(63) },
+      { stage: 2, name: 'Kadabra', dexId: 64, minLevel: 5, title: 'Spoon Bender', imageUrl: pokeImg(64) },
+      { stage: 3, name: 'Alakazam', dexId: 65, minLevel: 15, title: 'Cognitive Polymath', imageUrl: pokeImg(65) },
+    ],
+  },
+  meowscarada: {
+    baseId: 'meowscarada',
+    stages: [
+      { stage: 1, name: 'Sprigatito', dexId: 906, minLevel: 1, title: 'Whimsical Sprout', imageUrl: pokeImg(906) },
+      { stage: 2, name: 'Floragato', dexId: 907, minLevel: 5, title: 'Yo-Yo Virtuoso', imageUrl: pokeImg(907) },
+      { stage: 3, name: 'Meowscarada', dexId: 908, minLevel: 15, title: 'Floragato Showman', imageUrl: pokeImg(908) },
+    ],
+  },
+  skeledirge: {
+    baseId: 'skeledirge',
+    stages: [
+      { stage: 1, name: 'Fuecoco', dexId: 909, minLevel: 1, title: 'Laidback Ember', imageUrl: pokeImg(909) },
+      { stage: 2, name: 'Crocalor', dexId: 910, minLevel: 5, title: 'Rhythm Egghead', imageUrl: pokeImg(910) },
+      { stage: 3, name: 'Skeledirge', dexId: 911, minLevel: 15, title: 'Operatic Firebrand', imageUrl: pokeImg(911) },
+    ],
+  },
+  swampert: {
+    baseId: 'swampert',
+    stages: [
+      { stage: 1, name: 'Mudkip', dexId: 258, minLevel: 1, title: 'Fin Initiate', imageUrl: pokeImg(258) },
+      { stage: 2, name: 'Marshtomp', dexId: 259, minLevel: 5, title: 'Mud Brawler', imageUrl: pokeImg(259) },
+      { stage: 3, name: 'Swampert', dexId: 260, minLevel: 15, title: 'Torrential Titan', imageUrl: pokeImg(260) },
+    ],
+  },
+  aegislash: {
+    baseId: 'aegislash',
+    stages: [
+      { stage: 1, name: 'Honedge', dexId: 679, minLevel: 1, title: 'Spectral Blade', imageUrl: pokeImg(679) },
+      { stage: 2, name: 'Doublade', dexId: 680, minLevel: 5, title: 'Dual Swordsman', imageUrl: pokeImg(680) },
+      { stage: 3, name: 'Aegislash', dexId: 681, minLevel: 15, title: 'Stance Tactician', imageUrl: pokeImg(681) },
+    ],
+  },
+  glaceon: {
+    baseId: 'glaceon',
+    stages: [
+      { stage: 1, name: 'Eevee', dexId: 133, minLevel: 1, title: 'Frost Aspirant', imageUrl: pokeImg(133) },
+      { stage: 2, name: 'Glaceon', dexId: 471, minLevel: 10, title: 'Sub-Zero Specialist', imageUrl: pokeImg(471) },
+      { stage: 3, name: 'Glacial Glaceon', dexId: 471, minLevel: 15, title: 'Apex Frost Empress', imageUrl: pokeImg(471) },
+    ],
+  },
 };
 
 export function getEvolutionStage(pokemonId: PokemonId, level: number = 1): {
